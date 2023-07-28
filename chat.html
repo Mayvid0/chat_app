@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat</title>
+  </head>
+  <body>
+    <h1>Chat Room</h1>
+    <form id="form">
+      <input type="text" id="input" />
+      <button type="submit">Send message</button>
+    </form>
+    <ul id="text-space">
+
+    </ul>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+      const socket = io(); // Connect to the WebSocket server
+
+      socket.on("connection", () => {
+        console.log("Connected to the WebSocket server");  
+      });
+
+      var form = document.getElementById("form");
+        var input = document.getElementById("input");
+
+        form.addEventListener("submit", (e)=> {
+          e.preventDefault();
+          
+          if (input.value) {
+            socket.emit("chat message", input.value);
+            input.value = "";
+          }
+        });
+
+      socket.on('message',(data)=>{
+        const textSpace= document.getElementById('text-space')
+        const recMssg= document.createElement('p')
+        recMssg.innerHTML= data
+        textSpace.appendChild(recMssg)
+      })
+
+      socket.on("disconnect", () => {
+        console.log("Disconnected from the WebSocket server");
+      });
+    </script>
+  </body>
+</html>
