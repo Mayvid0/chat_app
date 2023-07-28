@@ -2,42 +2,68 @@
 <html>
   <head>
     <title>Chat</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Chat Room</h1>
-    <form id="form">
-      <input type="text" id="input" />
-      <button type="submit">Send message</button>
-    </form>
-    <ul id="text-space">
+    <h1>Chat Rooms</h1>
+    <div class="container">
+      <ul id="text-space"></ul>
+    </div>
 
-    </ul>
+    <form id="form">
+      <input type="text" id="input" placeholder="Type your message" />
+      <button type="submit" id="btn">Send message</button>
+    </form>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
     <script>
       const socket = io(); // Connect to the WebSocket server
 
-      socket.on("connection", () => {
-        console.log("Connected to the WebSocket server");  
+      // socket.on("connection", () => {
+      //   console.log("Connected to the WebSocket server");
+      // });
+
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+
+      const btn = document.getElementById("btn");
+      btn.addEventListener("mouseover", () => {
+        btn.style.backgroundColor = "green";
+      });
+      btn.addEventListener(
+        "mouseout",
+        () => (btn.style.backgroundColor = "#007bff")
+      );
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+
+        const roomNumber = urlParams.get("room");
+        const port = urlParams.get("port");
+        const userName = urlParams.get("username");
+        const message = input.value;
+
+        const data = { roomNumber, userName, message };
+
+        console.log("message sent ",data) //test point
+
+        if (input.value) {
+          socket.emit("chat message", data);
+          input.value = "";
+        }
       });
 
-      var form = document.getElementById("form");
-        var input = document.getElementById("input");
+      socket.on("message", (data) => {
+        console.log("message received for screen:",data)  
 
-        form.addEventListener("submit", (e)=> {
-          e.preventDefault();
-          
-          if (input.value) {
-            socket.emit("chat message", input.value);
-            input.value = "";
-          }
-        });
-
-      socket.on('message',(data)=>{
-        const textSpace= document.getElementById('text-space')
-        const recMssg= document.createElement('p')
-        recMssg.innerHTML= data
-        textSpace.appendChild(recMssg)
-      })
+        const textSpace = document.getElementById("text-space");
+        const recMssg = document.createElement("li");
+        recMssg.textContent= `${data.userName}: ${data.message}`
+        textSpace.appendChild(recMssg);
+      });
 
       socket.on("disconnect", () => {
         console.log("Disconnected from the WebSocket server");

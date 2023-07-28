@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node server",
-    "dev": "nodemon server.js"
+    "start":"node chatserver",
+    "start2": "node loginserver",
+    "dev": "nodemon chatserver.js",
+    "dev2": "nodemon loginserver.js"
   },
   "keywords": [],
   "author": "",

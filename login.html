@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <h1>Enter Room Number and Username</h1>
+    <form id="login-form" action="">
+      <input type="text" id="room-number" placeholder="Enter room number" />
+      <input type="text" id="username" placeholder="Enter username" />
+      <button type="submit">Join Room</button>
+    </form>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+      const socket = io();
+
+      const loginForm = document.getElementById("login-form");
+      const roomNumberInput = document.getElementById("room-number");
+      const usernameInput = document.getElementById("username");
+
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const roomNumber = roomNumberInput.value;
+        const username = usernameInput.value;
+
+        const roomInfo = { roomNumber, username };
+        if (roomNumber && username) {
+          // Send room number and username to the server
+          socket.emit("join room", roomInfo);
+        }
+      });
+
+      socket.on("room assigned", (data) => {
+        // Handle the data sent by the server (roomNumber, port, and username)
+        console.log("Room assigned:", data);
+        // Redirect to the main chat page
+        window.location.href = `http://localhost:4000/?room=${data.roomNumber}&username=${data.username}`;
+      });
+    </script>
+  </body>
+</html>
